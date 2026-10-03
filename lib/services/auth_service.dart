@@ -9,20 +9,20 @@ class AuthService {
 
   User? get currentUser => _auth.currentUser;
 
+  Future<void> initializeGoogleSignIn() async {
+    await _googleSignIn.initialize();
+  }
+
   Future<UserCredential?> signInWithGoogle() async {
-    try {
-      final googleUser = await _googleSignIn.authenticate();
+    final googleUser = await _googleSignIn.authenticate();
 
-      final googleAuth = googleUser.authentication;
+    final googleAuth = googleUser.authentication;
 
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
+    final credential = GoogleAuthProvider.credential(
+      idToken: googleAuth.idToken,
+    );
 
-      return await _auth.signInWithCredential(credential);
-    } catch (e) {
-      rethrow;
-    }
+    return await _auth.signInWithCredential(credential);
   }
 
   Future<UserCredential?> signUpWithEmail(
@@ -45,26 +45,33 @@ class AuthService {
     );
   }
 
-  Future<void> verifyPhoneNumber({
+  Future<void> sendPhoneCode({
     required String phoneNumber,
-    required void Function(String verificationId) onCodeSent,
-    required void Function(PhoneAuthCredential credential) onVerificationCompleted,
-    required void Function(FirebaseAuthException error) onVerificationFailed,
+    required void Function(String verificationId) codeSent,
+    required void Function(FirebaseAuthException error) verificationFailed,
   }) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
-      verificationCompleted: onVerificationCompleted,
-      verificationFailed: onVerificationFailed,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await _auth.signInWithCredential(credential);
+      },
+      verificationFailed: verificationFailed,
       codeSent: (verificationId, resendToken) {
-        onCodeSent(verificationId);
+        codeSent(verificationId);
       },
       codeAutoRetrievalTimeout: (verificationId) {},
     );
   }
 
-  Future<UserCredential?> signInWithPhoneCredential(
-    PhoneAuthCredential credential,
-  ) async {
+  Future<UserCredential?> verifyPhoneCode({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    final credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+
     return await _auth.signInWithCredential(credential);
   }
 
