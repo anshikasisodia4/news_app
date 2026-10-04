@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/news_model.dart';
 
 class NewsCard extends StatelessWidget {
@@ -17,53 +18,87 @@ class NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (article.imageUrl.isNotEmpty)
-              Image.network(
-                article.imageUrl,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox(
-                    height: 200,
-                    child: Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 50,
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(22),
+                ),
+                child: Image.network(
+                  article.imageUrl,
+                  width: double.infinity,
+                  height: 190,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    return Container(
+                      height: 190,
+                      color: const Color(0xFFE8ECE7),
+                      child: const Center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 45,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          article.source,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF6C756B),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        _formatDate(article.publishedAt),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF8A9188),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     article.title,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    article.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 19,
+                      height: 1.25,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF20251F),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -71,24 +106,34 @@ class NewsCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          '${article.source} • ${article.publishedAt}',
-                          maxLines: 1,
+                          article.description,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            height: 1.4,
+                            color: Color(0xFF737A71),
                           ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: onBookmark,
-                        icon: Icon(
-                          isBookmarked
-                              ? Icons.bookmark
-                              : Icons.bookmark_border,
+                      const SizedBox(width: 8),
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F4EF),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: IconButton(
+                          onPressed: onBookmark,
+                          padding: EdgeInsets.zero,
+                          icon: Icon(
+                            isBookmarked
+                                ? Icons.bookmark
+                                : Icons.bookmark_border,
+                            size: 21,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                     ],
@@ -100,5 +145,32 @@ class NewsCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatDate(String date) {
+    if (date.isEmpty) {
+      return '';
+    }
+
+    try {
+      final parsedDate = DateTime.parse(date);
+      final difference = DateTime.now().difference(parsedDate);
+
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} min ago';
+      }
+
+      if (difference.inHours < 24) {
+        return '${difference.inHours} hr ago';
+      }
+
+      if (difference.inDays < 7) {
+        return '${difference.inDays} days ago';
+      }
+
+      return '${parsedDate.day}/${parsedDate.month}/${parsedDate.year}';
+    } catch (_) {
+      return date;
+    }
   }
 }
