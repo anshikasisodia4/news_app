@@ -27,7 +27,7 @@ class NewsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -46,7 +46,7 @@ class NewsCard extends StatelessWidget {
                   width: double.infinity,
                   height: 190,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
+                  errorBuilder: (context, error, stackTrace) {
                     return Container(
                       height: 190,
                       color: const Color(0xFFE8ECE7),
@@ -81,7 +81,7 @@ class NewsCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        _formatDate(article.publishedAt),
+                        formatDate(article.publishedAt),
                         style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFF8A9188),
@@ -147,7 +147,7 @@ class NewsCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String date) {
+  String formatDate(String date) {
     if (date.isEmpty) {
       return '';
     }
@@ -169,7 +169,7 @@ class NewsCard extends StatelessWidget {
       }
 
       return '${parsedDate.day}/${parsedDate.month}/${parsedDate.year}';
-    } catch (_) {
+    } catch (e) {
       return date;
     }
   }

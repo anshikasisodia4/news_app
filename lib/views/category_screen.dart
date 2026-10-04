@@ -144,7 +144,7 @@ class _CategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

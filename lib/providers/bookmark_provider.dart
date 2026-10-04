@@ -1,78 +1,97 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+
 import '../models/news_model.dart';
-import '../services/firestore_service.dart';
 
 class BookmarkProvider extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  List<NewsModel> _bookmarks = [];
-  bool _isLoading = false;
-  String? _error;
-
-  List<NewsModel> get bookmarks => _bookmarks;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
+  List<NewsModel> bookmarks = [];
+  bool isLoading = false;
+  String? error;
 
   Future<void> loadBookmarks(String userId) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
+    isLoading = true;
+    error = null;
+    notifyListeners();
 
-      _bookmarks = await _firestoreService.getBookmarks(userId);
+    try {
+      final snapshot = await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('bookmarks')
+          .get();
+
+      bookmarks = snapshot.docs
+          .map((doc) => NewsModel.fromMap(doc.data()))
+          .toList();
     } catch (e) {
-      _error = 'Unable to load bookmarks';
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      error = e.toString();
     }
+
+    isLoading = false;
+    notifyListeners();
   }
 
-  Future<void> addBookmark(
+  Future<bool> addBookmark(
     String userId,
     NewsModel article,
   ) async {
     try {
-      await _firestoreService.addBookmark(
-        userId,
-        article,
+      await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('bookmarks')
+          .doc(article.id)
+          .set(article.toMap());
+
+      bookmarks.removeWhere(
+        (item) => item.id == article.id,
       );
 
-      if (!_bookmarks.any((item) => item.id == article.id)) {
-        _bookmarks.add(article);
-      }
+      bookmarks.add(article);
 
+      error = null;
       notifyListeners();
+
+      return true;
     } catch (e) {
-      _error = 'Unable to save bookmark';
+      error = e.toString();
       notifyListeners();
+      return false;
     }
   }
 
-  Future<void> removeBookmark(
+  Future<bool> removeBookmark(
     String userId,
     String articleId,
   ) async {
     try {
-      await _firestoreService.removeBookmark(
-        userId,
-        articleId,
+      await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('bookmarks')
+          .doc(articleId)
+          .delete();
+
+      bookmarks.removeWhere(
+        (item) => item.id == articleId,
       );
 
-      _bookmarks.removeWhere(
-        (article) => article.id == articleId,
-      );
-
+      error = null;
       notifyListeners();
+
+      return true;
     } catch (e) {
-      _error = 'Unable to remove bookmark';
+      error = e.toString();
       notifyListeners();
+      return false;
     }
   }
 
   bool isBookmarked(String articleId) {
-    return _bookmarks.any(
-      (article) => article.id == articleId,
+    return bookmarks.any(
+      (item) => item.id == articleId,
     );
   }
 
@@ -81,15 +100,9 @@ class BookmarkProvider extends ChangeNotifier {
     NewsModel article,
   ) async {
     if (isBookmarked(article.id)) {
-      await removeBookmark(
-        userId,
-        article.id,
-      );
+      await removeBookmark(userId, article.id);
     } else {
-      await addBookmark(
-        userId,
-        article,
-      );
+      await addBookmark(userId, article);
     }
   }
 }

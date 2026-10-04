@@ -97,7 +97,7 @@ class ArticleDetailScreen extends StatelessWidget {
                           width: double.infinity,
                           height: 240,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) {
+                          errorBuilder: (_, _,_) {
                             return Container(
                               height: 240,
                               decoration: BoxDecoration(
