@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
+import '../home_screen.dart';
 import 'phone_login_screen.dart';
 import 'signup_screen.dart';
-import '../home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,68 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  Future<void> loginWithGoogle() async {
-    final authProvider = context.read<AuthProvider>();
-
-    final success = await authProvider.loginWithGoogle();
-
-    if (success && mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-        (route) => false,
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            authProvider.error ?? 'Google login failed',
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> loginWithEmail() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Enter email and password'),
-        ),
-      );
-      return;
-    }
-
-    final authProvider = context.read<AuthProvider>();
-
-    final success = await authProvider.loginWithEmail(
-      email,
-      password,
-    );
-
-    if (success && mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-        (route) => false,
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            authProvider.error ?? 'Login failed',
-          ),
-        ),
-      );
-    }
-  }
+  bool obscurePassword = true;
 
   @override
   void dispose() {
@@ -87,136 +26,305 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      _showMessage('Please enter email and password');
+      return;
+    }
+
+    final auth = context.read<AuthProvider>();
+
+    await auth.loginWithEmail(email, password);
+
+    if (!mounted) return;
+
+    if (auth.error != null) {
+      _showMessage(auth.error!);
+      return;
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const HomeScreen(),
+      ),
+      (route) => false,
+    );
+  }
+
+  Future<void> loginWithGoogle() async {
+    final auth = context.read<AuthProvider>();
+
+    await auth.loginWithGoogle();
+
+    if (!mounted) return;
+
+    if (auth.error != null) {
+      _showMessage(auth.error!);
+      return;
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const HomeScreen(),
+      ),
+      (route) => false,
+    );
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final auth = context.watch<AuthProvider>();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F5F0),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minHeight: 700,
-            ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.newspaper,
-                  size: 80,
+                Center(
+                  child: Container(
+                    width: 78,
+                    height: 78,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: const Icon(
+                      Icons.newspaper_rounded,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Welcome to News App',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(height: 24),
+                const Center(
+                  child: Text(
+                    'News Hub',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF20251F),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Login to stay updated with the latest news',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 35),
-                TextField(
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(),
+                const Center(
+                  child: Text(
+                    'Stay informed. Stay connected.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF737A71),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(),
+                const SizedBox(height: 35),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(26),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Welcome Back',
+                        style: TextStyle(
+                          fontSize: 23,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF20251F),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Login to continue reading the latest news.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF737A71),
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      TextField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          filled: true,
+                          fillColor: const Color(0xFFF2F5F0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: passwordController,
+                        obscureText: obscurePassword,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                obscurePassword = !obscurePassword;
+                              });
+                            },
+                            icon: Icon(
+                              obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xFFF2F5F0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: auth.isLoading ? null : login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: auth.isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'OR',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ),
+                          const Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: OutlinedButton.icon(
+                          onPressed: auth.isLoading ? null : loginWithGoogle,
+                          icon: const Icon(Icons.g_mobiledata, size: 28),
+                          label: const Text(
+                            'Continue with Google',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.black87,
+                            side: const BorderSide(
+                              color: Color(0xFFD9DED7),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const PhoneLoginScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.phone_outlined),
+                          label: const Text(
+                            'Continue with Phone',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.black87,
+                            side: const BorderSide(
+                              color: Color(0xFFD9DED7),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed:
-                        authProvider.isLoading ? null : loginWithEmail,
-                    child: authProvider.isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text(
-                            'Login',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: const [
-                    Expanded(child: Divider()),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('OR'),
-                    ),
-                    Expanded(child: Divider()),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton.icon(
-                    onPressed:
-                        authProvider.isLoading ? null : loginWithGoogle,
-                    icon: const Icon(
-                      Icons.g_mobiledata,
-                      size: 30,
-                    ),
-                    label: const Text(
-                      'Continue with Google',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton.icon(
+                Center(
+                  child: TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const PhoneLoginScreen(),
+                          builder: (_) => const SignupScreen(),
                         ),
                       );
                     },
-                    icon: const Icon(Icons.phone),
-                    label: const Text(
-                      'Continue with Phone',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const SignupScreen(),
+                    child: const Text(
+                      "Don't have an account? Sign Up",
+                      style: TextStyle(
+                        color: Color(0xFF20251F),
+                        fontWeight: FontWeight.w600,
                       ),
-                    );
-                  },
-                  child: const Text(
-                    'Create a new account',
-                    style: TextStyle(fontSize: 15),
+                    ),
                   ),
                 ),
               ],
