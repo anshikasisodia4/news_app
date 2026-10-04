@@ -1,10 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
-import 'home_screen.dart';
 import 'auth/login_screen.dart';
+import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,26 +18,28 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), checkLoginState);
+    _startApp();
   }
 
-  void checkLoginState() {
+  Future<void> _startApp() async {
+    await Future.delayed(const Duration(seconds: 2));
+
     if (!mounted) return;
 
-    final authProvider = context.read<AuthProvider>();
+    final auth = context.read<AuthProvider>();
 
-    if (authProvider.isLoggedIn) {
+    if (auth.isLoggedIn) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
+          builder: (_) => const HomeScreen(),
         ),
       );
     } else {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
+          builder: (_) => const LoginScreen(),
         ),
       );
     }
@@ -45,31 +48,50 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F5F0),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.newspaper,
-              size: 80,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'News App',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Icon(
+                Icons.newspaper_rounded,
+                color: Colors.white,
+                size: 52,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 25),
             const Text(
-              'Stay informed, stay updated',
+              'News Hub',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF20251F),
               ),
             ),
-            const SizedBox(height: 30),
-            const CircularProgressIndicator(),
+            const SizedBox(height: 8),
+            const Text(
+              'Your daily source of news',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF737A71),
+              ),
+            ),
+            const SizedBox(height: 35),
+            const SizedBox(
+              width: 25,
+              height: 25,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: Colors.black,
+              ),
+            ),
           ],
         ),
       ),
