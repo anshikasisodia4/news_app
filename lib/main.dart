@@ -43,7 +43,7 @@ class NewsApp extends StatelessWidget {
         builder: (context, themeProvider, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'News App',
+            title: 'NewsNest',
             themeMode: themeProvider.themeMode,
             theme: ThemeData(
               brightness: Brightness.light,
