@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/auth_provider.dart';
 import 'auth/login_screen.dart';
 import 'home_screen.dart';
@@ -58,13 +60,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
               ),
-              padding: const EdgeInsets.all(12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: Image.asset(
-                  'lib/assets/logo.jpg',
-                  fit: BoxFit.cover,
-                ),
+              child: const Icon(
+                Icons.newspaper,
+                size: 75,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 25),

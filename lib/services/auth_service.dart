@@ -2,18 +2,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
-  Stream<User?> get authStateChanges => auth.authStateChanges();
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  User? get currentUser => auth.currentUser;
+  User? get currentUser => _auth.currentUser;
+
+  Future<void> initializeGoogleSignIn() async {
+    await _googleSignIn.initialize(
+      serverClientId:
+          '92863232638-n4n8c36d4u40emm5e3gr3a6v2o1ms6b7.apps.googleusercontent.com',
+    );
+  }
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      await googleSignIn.initialize();
-
-      final googleUser = await googleSignIn.authenticate();
+      final googleUser = await _googleSignIn.authenticate();
 
       final googleAuth = googleUser.authentication;
 
@@ -21,7 +26,7 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      return await auth.signInWithCredential(credential);
+      return await _auth.signInWithCredential(credential);
     } catch (e) {
       print('Google Sign-In Error: $e');
       return null;
@@ -32,7 +37,7 @@ class AuthService {
     String email,
     String password,
   ) async {
-    return await auth.createUserWithEmailAndPassword(
+    return await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -42,7 +47,7 @@ class AuthService {
     String email,
     String password,
   ) async {
-    return await auth.signInWithEmailAndPassword(
+    return await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -53,10 +58,10 @@ class AuthService {
     required void Function(String verificationId) codeSent,
     required void Function(FirebaseAuthException error) verificationFailed,
   }) async {
-    await auth.verifyPhoneNumber(
+    await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
       },
       verificationFailed: verificationFailed,
       codeSent: (verificationId, resendToken) {
@@ -75,11 +80,11 @@ class AuthService {
       smsCode: smsCode,
     );
 
-    return await auth.signInWithCredential(credential);
+    return await _auth.signInWithCredential(credential);
   }
 
   Future<void> logout() async {
-    await googleSignIn.signOut();
-    await auth.signOut();
+    await _googleSignIn.signOut();
+    await _auth.signOut();
   }
 }
