@@ -1,43 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final AuthService authService = AuthService();
 
-  User? _user;
-  bool _isLoading = false;
-  String? _error;
+  User? user;
+  bool isLoading = false;
+  String? error;
 
-  User? get user => _user;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
-  bool get isLoggedIn => _user != null;
+  bool get isLoggedIn => user != null;
 
   AuthProvider() {
-    _authService.authStateChanges.listen((user) {
-      _user = user;
+    authService.authStateChanges.listen((currentUser) {
+      user = currentUser;
       notifyListeners();
     });
   }
 
-  Future<void> initializeGoogleSignIn() async {
-    await _authService.initializeGoogleSignIn();
-  }
-
   Future<bool> loginWithGoogle() async {
     try {
-      _setLoading(true);
-      _error = null;
+      setLoading(true);
+      error = null;
 
-      await _authService.signInWithGoogle();
+      final result = await authService.signInWithGoogle();
+
+      if (result == null) {
+        error = 'Google Sign-In failed';
+        return false;
+      }
+
+      user = result.user;
+      notifyListeners();
 
       return true;
     } catch (e) {
-      _error = e.toString();
+      error = e.toString();
+      debugPrint('Google Sign-In Error: $e');
       return false;
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -46,20 +49,28 @@ class AuthProvider extends ChangeNotifier {
     String password,
   ) async {
     try {
-      _setLoading(true);
-      _error = null;
+      setLoading(true);
+      error = null;
 
-      await _authService.loginWithEmail(
+      final result = await authService.loginWithEmail(
         email,
         password,
       );
 
+      if (result == null) {
+        error = 'Login failed';
+        return false;
+      }
+
+      user = result.user;
+      notifyListeners();
+
       return true;
     } catch (e) {
-      _error = e.toString();
+      error = e.toString();
       return false;
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -68,20 +79,28 @@ class AuthProvider extends ChangeNotifier {
     String password,
   ) async {
     try {
-      _setLoading(true);
-      _error = null;
+      setLoading(true);
+      error = null;
 
-      await _authService.signUpWithEmail(
+      final result = await authService.signUpWithEmail(
         email,
         password,
       );
 
+      if (result == null) {
+        error = 'Signup failed';
+        return false;
+      }
+
+      user = result.user;
+      notifyListeners();
+
       return true;
     } catch (e) {
-      _error = e.toString();
+      error = e.toString();
       return false;
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -90,24 +109,24 @@ class AuthProvider extends ChangeNotifier {
     void Function(String verificationId) onCodeSent,
   ) async {
     try {
-      _setLoading(true);
-      _error = null;
+      setLoading(true);
+      error = null;
 
-      await _authService.sendPhoneCode(
+      await authService.sendPhoneCode(
         phoneNumber: phoneNumber,
         codeSent: onCodeSent,
-        verificationFailed: (error) {
-          _error = error.message;
+        verificationFailed: (firebaseError) {
+          error = firebaseError.message;
           notifyListeners();
         },
       );
 
-      return true;
+      return error == null;
     } catch (e) {
-      _error = e.toString();
+      error = e.toString();
       return false;
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -116,31 +135,40 @@ class AuthProvider extends ChangeNotifier {
     String smsCode,
   ) async {
     try {
-      _setLoading(true);
-      _error = null;
+      setLoading(true);
+      error = null;
 
-      await _authService.verifyPhoneCode(
+      final result = await authService.verifyPhoneCode(
         verificationId: verificationId,
         smsCode: smsCode,
       );
 
+      if (result == null) {
+        error = 'Phone verification failed';
+        return false;
+      }
+
+      user = result.user;
+      notifyListeners();
+
       return true;
     } catch (e) {
-      _error = e.toString();
+      error = e.toString();
       return false;
     } finally {
-      _setLoading(false);
+      setLoading(false);
     }
   }
 
   Future<void> logout() async {
-    await _authService.logout();
-    _user = null;
+    await authService.logout();
+
+    user = null;
     notifyListeners();
   }
 
-  void _setLoading(bool value) {
-    _isLoading = value;
+  void setLoading(bool value) {
+    isLoading = value;
     notifyListeners();
   }
 }

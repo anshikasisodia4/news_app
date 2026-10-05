@@ -2,34 +2,37 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<User?> get authStateChanges => auth.authStateChanges();
 
-  User? get currentUser => _auth.currentUser;
-
-  Future<void> initializeGoogleSignIn() async {
-    await _googleSignIn.initialize();
-  }
+  User? get currentUser => auth.currentUser;
 
   Future<UserCredential?> signInWithGoogle() async {
-    final googleUser = await _googleSignIn.authenticate();
+    try {
+      await googleSignIn.initialize();
 
-    final googleAuth = googleUser.authentication;
+      final googleUser = await googleSignIn.authenticate();
 
-    final credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
-    );
+      final googleAuth = googleUser.authentication;
 
-    return await _auth.signInWithCredential(credential);
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      return await auth.signInWithCredential(credential);
+    } catch (e) {
+      print('Google Sign-In Error: $e');
+      return null;
+    }
   }
 
   Future<UserCredential?> signUpWithEmail(
     String email,
     String password,
   ) async {
-    return await _auth.createUserWithEmailAndPassword(
+    return await auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -39,7 +42,7 @@ class AuthService {
     String email,
     String password,
   ) async {
-    return await _auth.signInWithEmailAndPassword(
+    return await auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -50,10 +53,10 @@ class AuthService {
     required void Function(String verificationId) codeSent,
     required void Function(FirebaseAuthException error) verificationFailed,
   }) async {
-    await _auth.verifyPhoneNumber(
+    await auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
+        await auth.signInWithCredential(credential);
       },
       verificationFailed: verificationFailed,
       codeSent: (verificationId, resendToken) {
@@ -72,11 +75,11 @@ class AuthService {
       smsCode: smsCode,
     );
 
-    return await _auth.signInWithCredential(credential);
+    return await auth.signInWithCredential(credential);
   }
 
   Future<void> logout() async {
-    await _googleSignIn.signOut();
-    await _auth.signOut();
+    await googleSignIn.signOut();
+    await auth.signOut();
   }
 }
