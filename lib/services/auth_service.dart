@@ -6,22 +6,34 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
+  bool _googleInitialized = false;
+
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   User? get currentUser => _auth.currentUser;
 
   Future<void> initializeGoogleSignIn() async {
+    if (_googleInitialized) return;
+
     await _googleSignIn.initialize(
       serverClientId:
           '92863232638-n4n8c36d4u40emm5e3gr3a6v2o1ms6b7.apps.googleusercontent.com',
     );
+
+    _googleInitialized = true;
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<UserCredential> signInWithGoogle() async {
     try {
+      await initializeGoogleSignIn();
+
       final googleUser = await _googleSignIn.authenticate();
 
       final googleAuth = googleUser.authentication;
+
+      if (googleAuth.idToken == null) {
+        throw Exception('Google ID token is null');
+      }
 
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
@@ -30,11 +42,11 @@ class AuthService {
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       debugPrint('Google Sign-In Error: $e');
-      return null;
+      rethrow;
     }
   }
 
-  Future<UserCredential?> signUpWithEmail(
+  Future<UserCredential> signUpWithEmail(
     String email,
     String password,
   ) async {
@@ -44,7 +56,7 @@ class AuthService {
     );
   }
 
-  Future<UserCredential?> loginWithEmail(
+  Future<UserCredential> loginWithEmail(
     String email,
     String password,
   ) async {
@@ -62,7 +74,11 @@ class AuthService {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
+        try {
+          await _auth.signInWithCredential(credential);
+        } catch (e) {
+          debugPrint('Automatic phone verification error: $e');
+        }
       },
       verificationFailed: verificationFailed,
       codeSent: (verificationId, resendToken) {
@@ -72,7 +88,7 @@ class AuthService {
     );
   }
 
-  Future<UserCredential?> verifyPhoneCode({
+  Future<UserCredential> verifyPhoneCode({
     required String verificationId,
     required String smsCode,
   }) async {
