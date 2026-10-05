@@ -1,11 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
-import 'providers/news_provider.dart';
 import 'providers/bookmark_provider.dart';
+import 'providers/news_provider.dart';
 import 'providers/theme_provider.dart';
 import 'views/splash_screen.dart';
 
@@ -39,23 +39,25 @@ class NewsApp extends StatelessWidget {
           create: (_) => ThemeProvider(),
         ),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'NewsNest',
-            themeMode: themeProvider.themeMode,
-            theme: ThemeData(
-              brightness: Brightness.light,
-              useMaterial3: true,
-            ),
-            darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              useMaterial3: true,
-            ),
-            home: const SplashScreen(),
-          );
-        },
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'News Hub',
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          useMaterial3: true,
+          scaffoldBackgroundColor: const Color(0xFF121212),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.white,
+            brightness: Brightness.dark,
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF121212),
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          cardColor: const Color(0xFF1E1E1E),
+        ),
+        home: const SplashScreen(),
       ),
     );
   }

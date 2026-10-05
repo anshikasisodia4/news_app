@@ -63,9 +63,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final bookmarks = context.watch<BookmarkProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F5F0),
+      backgroundColor: const Color(0xFF121212),
       body: SafeArea(
         child: RefreshIndicator(
+          color: Colors.white,
+          backgroundColor: const Color(0xFF1E1E1E),
           onRefresh: news.fetchNews,
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -78,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -92,15 +95,27 @@ class _HomeScreenState extends State<HomeScreen> {
               TextField(
                 controller: searchController,
                 onSubmitted: (_) => search(),
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
                 decoration: InputDecoration(
                   hintText: 'Search news...',
-                  prefixIcon: const Icon(Icons.search),
+                  hintStyle: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Colors.grey,
+                  ),
                   suffixIcon: IconButton(
                     onPressed: search,
-                    icon: const Icon(Icons.arrow_forward),
+                    icon: const Icon(
+                      Icons.arrow_forward,
+                      color: Colors.white,
+                    ),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: const Color(0xFF1E1E1E),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(18),
                     borderSide: BorderSide.none,
@@ -115,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: categories.length,
-                  separatorBuilder: (_,_) =>
+                  separatorBuilder: (_, _) =>
                       const SizedBox(width: 8),
                   itemBuilder: (_, index) {
                     final category = categories[index];
@@ -130,13 +145,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       onSelected: (_) {
                         news.changeCategory(category['value']!);
                       },
-                      selectedColor: Colors.black,
+                      selectedColor: Colors.white,
                       labelStyle: TextStyle(
                         color: selected
-                            ? Colors.white
-                            : Colors.black,
+                            ? Colors.black
+                            : Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
-                      backgroundColor: Colors.white,
+                      backgroundColor: const Color(0xFF292929),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(22),
                         side: BorderSide.none,
@@ -156,12 +172,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: const Text('See All'),
+                    child: const Text(
+                      'See All',
+                      style: TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -172,7 +194,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Padding(
                   padding: EdgeInsets.all(40),
                   child: Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
                   ),
                 )
               else if (news.error != null)
@@ -183,15 +207,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Icon(
                         Icons.error_outline,
                         size: 45,
+                        color: Colors.white,
                       ),
                       const SizedBox(height: 10),
                       Text(
                         news.error!,
                         textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: news.fetchNews,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                        ),
                         child: const Text('Try Again'),
                       ),
                     ],
@@ -201,7 +233,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Padding(
                   padding: EdgeInsets.all(30),
                   child: Center(
-                    child: Text('No news found'),
+                    child: Text(
+                      'No news found',
+                      style: TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
                   ),
                 )
               else
@@ -240,9 +277,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF1E1E1E),
         currentIndex: 0,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
+        selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
           if (index == 1) {
@@ -299,12 +337,15 @@ class _HomeScreenState extends State<HomeScreen> {
       width: 48,
       height: 48,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFF1E1E1E),
         shape: BoxShape.circle,
       ),
       child: IconButton(
         onPressed: () {},
-        icon: Icon(icon),
+        icon: Icon(
+          icon,
+          color: Colors.white,
+        ),
       ),
     );
   }

@@ -8,16 +8,19 @@ class AuthProvider extends ChangeNotifier {
 
   User? _user;
   bool _isLoading = false;
+  bool _isInitialized = false;
   String? _error;
 
   User? get user => _user;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
   String? get error => _error;
   bool get isLoggedIn => _user != null;
 
   AuthProvider() {
     _authService.authStateChanges.listen((user) {
       _user = user;
+      _isInitialized = true;
       notifyListeners();
     });
   }
@@ -50,10 +53,7 @@ class AuthProvider extends ChangeNotifier {
       _setLoading(true);
       _error = null;
 
-      await _authService.loginWithEmail(
-        email,
-        password,
-      );
+      await _authService.loginWithEmail(email, password);
 
       return true;
     } catch (e) {
@@ -72,10 +72,7 @@ class AuthProvider extends ChangeNotifier {
       _setLoading(true);
       _error = null;
 
-      await _authService.signUpWithEmail(
-        email,
-        password,
-      );
+      await _authService.signUpWithEmail(email, password);
 
       return true;
     } catch (e) {
