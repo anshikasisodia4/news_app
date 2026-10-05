@@ -94,7 +94,15 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        backgroundColor: const Color(0xFF2A2A2A),
+        content: Text(
+          message,
+          style: const TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 
@@ -103,7 +111,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F5F0),
+      backgroundColor: const Color(0xFF121212),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 25, 24, 25),
@@ -114,57 +122,75 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                 width: 48,
                 height: 48,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: Color(0xFF1E1E1E),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                  ),
                 ),
               ),
+
               const SizedBox(height: 30),
+
               Center(
                 child: Container(
-                  width: 75,
-                  height: 75,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(23),
+                    color: const Color(0xFF1E1E1E),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: const Color(0xFF303030),
+                    ),
                   ),
                   child: const Icon(
                     Icons.phone_android_rounded,
                     color: Colors.white,
-                    size: 38,
+                    size: 40,
                   ),
                 ),
               ),
+
               const SizedBox(height: 22),
+
               const Center(
                 child: Text(
-                  'Phone Login',
+                  'NewsNest',
                   style: TextStyle(
-                    fontSize: 29,
+                    fontSize: 30,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF20251F),
+                    color: Colors.white,
                   ),
                 ),
               ),
-              const SizedBox(height: 7),
+
+              const SizedBox(height: 6),
+
               const Center(
                 child: Text(
                   'Login securely using your phone number.',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF737A71),
+                    color: Colors.white54,
                   ),
                 ),
               ),
+
               const SizedBox(height: 30),
+
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(26),
+                  border: Border.all(
+                    color: const Color(0xFF303030),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,45 +200,77 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                       style: TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF20251F),
+                        color: Colors.white,
                       ),
                     ),
+
                     const SizedBox(height: 7),
+
                     const Text(
                       'Include your country code, for example +91.',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF737A71),
+                        color: Colors.white54,
                       ),
                     ),
+
                     const SizedBox(height: 20),
+
                     TextField(
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
                       enabled: !otpSent,
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
                       decoration: InputDecoration(
                         labelText: 'Phone Number',
+                        labelStyle: const TextStyle(
+                          color: Colors.white54,
+                        ),
                         hintText: '+91 9876543210',
-                        prefixIcon: const Icon(Icons.phone_outlined),
+                        hintStyle: const TextStyle(
+                          color: Colors.white38,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.phone_outlined,
+                          color: Colors.white54,
+                        ),
                         filled: true,
-                        fillColor: const Color(0xFFF2F5F0),
+                        fillColor: const Color(0xFF292929),
                         border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        disabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
                         ),
                       ),
                     ),
+
                     if (otpSent) ...[
                       const SizedBox(height: 18),
+
                       TextField(
                         controller: otpController,
                         keyboardType: TextInputType.number,
                         maxLength: 6,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          letterSpacing: 4,
+                        ),
                         decoration: InputDecoration(
                           labelText: 'Enter OTP',
-                          prefixIcon: const Icon(Icons.password_outlined),
+                          labelStyle: const TextStyle(
+                            color: Colors.white54,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.password_outlined,
+                            color: Colors.white54,
+                          ),
                           filled: true,
-                          fillColor: const Color(0xFFF2F5F0),
+                          fillColor: const Color(0xFF292929),
                           counterText: '',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -221,7 +279,9 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                         ),
                       ),
                     ],
+
                     const SizedBox(height: 22),
+
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -232,8 +292,12 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                                 ? verifyCode
                                 : sendCode,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          disabledBackgroundColor:
+                              const Color(0xFF444444),
+                          disabledForegroundColor:
+                              Colors.white54,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -245,20 +309,24 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               )
                             : Text(
-                                otpSent ? 'Verify OTP' : 'Send OTP',
+                                otpSent
+                                    ? 'Verify OTP'
+                                    : 'Send OTP',
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                       ),
                     ),
+
                     if (otpSent) ...[
                       const SizedBox(height: 12),
+
                       Center(
                         child: TextButton(
                           onPressed: () {
@@ -271,7 +339,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                           child: const Text(
                             'Change Phone Number',
                             style: TextStyle(
-                              color: Color(0xFF20251F),
+                              color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
