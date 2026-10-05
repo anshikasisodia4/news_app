@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../providers/news_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/bookmark_provider.dart';
@@ -56,6 +55,27 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  String get currentDate {
+    final now = DateTime.now();
+
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+
+    return '${months[now.month - 1]} ${now.day}, ${now.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final news = context.watch<NewsProvider>();
@@ -73,24 +93,54 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Expanded(
-                    child: Text(
-                      'News Hub',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'NewsNest',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Stay informed. Stay ahead.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white54,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  _iconButton(Icons.search),
-                  const SizedBox(width: 8),
-                  _iconButton(Icons.notifications_none),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_outlined,
+                        color: Colors.white70,
+                        size: 19,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        currentDate,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white60,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               TextField(
                 controller: searchController,
@@ -136,7 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     final category = categories[index];
 
                     final selected =
-                        news.selectedCategory == category['value'] &&
+                        news.selectedCategory ==
+                                category['value'] &&
                             news.searchQuery.isEmpty;
 
                     return ChoiceChip(
@@ -152,7 +203,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             : Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
-                      backgroundColor: const Color(0xFF292929),
+                      backgroundColor:
+                          const Color(0xFF292929),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(22),
                         side: BorderSide.none,
@@ -263,7 +315,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ArticleDetailScreen(
+                            builder: (_) =>
+                                ArticleDetailScreen(
                               article: article,
                             ),
                           ),
@@ -328,24 +381,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Profile',
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _iconButton(IconData icon) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E1E1E),
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        onPressed: () {},
-        icon: Icon(
-          icon,
-          color: Colors.white,
-        ),
       ),
     );
   }
