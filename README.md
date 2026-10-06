@@ -1,17 +1,61 @@
-# news_app
+# NewsNest 📰
 
-A new Flutter project.
+NewsNest is a Flutter news app that lets users browse, search, and save news articles in one place.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Email, Google & Phone Authentication
+- Latest news using GNews API
+- Search news
+- News categories
+- Save and remove bookmarks
+- Firebase Firestore
+- Open full articles in the browser
+- Dark theme
+- Login/logout with persistent login state
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Flutter & Dart
+- Firebase Authentication
+- Cloud Firestore
+- GNews API
+- Provider
+- URL Launcher
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Project Structure
+
+lib/
+├── models/
+├── services/
+├── providers/
+├── utils/
+├── widgets/
+└── views/
+
+The project follows an MVC-style structure with Provider for state management.
+
+## Setup
+
+1. Clone the repository.
+
+2. Install dependencies:
+
+flutter pub get
+
+3. Configure Firebase.
+
+4. Add your GNews API key in:
+
+lib/services/news_api_service.dart
+
+5. Run the app:
+
+flutter run
+
+## Author
+Anshika Sisodiya
+
+NewsNest - Flutter News App
+
+Built with Flutter & Firebase 
