@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/news_model.dart';
-import '../providers/auth_provider.dart';
-import '../providers/bookmark_provider.dart';
 
 class ArticleDetailScreen extends StatelessWidget {
   final NewsModel article;
@@ -14,216 +11,214 @@ class ArticleDetailScreen extends StatelessWidget {
     required this.article,
   });
 
-  Future<void> _openArticle() async {
-    final uri = Uri.parse(article.articleUrl);
+  Future<void> _openFullArticle(BuildContext context) async {
+    final url = article.articleUrl.trim();
 
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(
+    if (url.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Article link is not available'),
+        ),
+      );
+      return;
+    }
+
+    final uri = Uri.tryParse(url);
+
+    if (uri == null ||
+        (uri.scheme != 'http' && uri.scheme != 'https')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid article link'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final opened = await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
+
+      if (!opened && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open the article in browser'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to open browser'),
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    final bookmarks = context.watch<BookmarkProvider>();
-
-    final isBookmarked = bookmarks.isBookmarked(article.id);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F5F0),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              backgroundColor: const Color(0xFFF2F5F0),
-              elevation: 0,
-              pinned: true,
-              leading: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back),
-                  ),
+      backgroundColor: const Color(0xFF121212),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF121212),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Article',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (article.imageUrl.isNotEmpty)
+              Image.network(
+                article.imageUrl,
+                width: double.infinity,
+                height: 240,
+                fit: BoxFit.cover,
+                errorBuilder: (
+                  context,
+                  error,
+                  stackTrace,
+                ) {
+                  return Container(
+                    width: double.infinity,
+                    height: 240,
+                    color: const Color(0xFF1E1E1E),
+                    child: const Icon(
+                      Icons.image_not_supported_outlined,
+                      color: Colors.white54,
+                      size: 55,
+                    ),
+                  );
+                },
+              )
+            else
+              Container(
+                width: double.infinity,
+                height: 240,
+                color: const Color(0xFF1E1E1E),
+                child: const Icon(
+                  Icons.newspaper,
+                  color: Colors.white54,
+                  size: 55,
                 ),
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        final user = auth.user;
-
-                        if (user != null) {
-                          bookmarks.toggleBookmark(
-                            user.uid,
-                            article,
-                          );
-                        }
-                      },
-                      icon: Icon(
-                        isBookmarked
-                            ? Icons.bookmark
-                            : Icons.bookmark_border,
-                      ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                20,
+                22,
+                20,
+                30,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    article.source,
+                    style: const TextStyle(
+                      color: Colors.white60,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-              ],
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (article.imageUrl.isNotEmpty)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
-                        child: Image.network(
-                          article.imageUrl,
-                          width: double.infinity,
-                          height: 240,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _,_) {
-                            return Container(
-                              height: 240,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE5EAE3),
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  size: 50,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    const SizedBox(height: 20),
+                  const SizedBox(height: 10),
+                  Text(
+                    article.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.w800,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (article.publishedAt.isNotEmpty)
                     Row(
                       children: [
+                        const Icon(
+                          Icons.calendar_today_outlined,
+                          color: Colors.white54,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 7),
                         Expanded(
                           child: Text(
-                            article.source,
+                            article.publishedAt,
                             style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF697268),
+                              color: Colors.white54,
+                              fontSize: 13,
                             ),
-                          ),
-                        ),
-                        Text(
-                          _formatDate(article.publishedAt),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF858C83),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                  const SizedBox(height: 24),
+                  if (article.description.isNotEmpty)
                     Text(
-                      article.title,
+                      article.description,
                       style: const TextStyle(
-                        fontSize: 27,
-                        height: 1.2,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF20251F),
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        height: 1.6,
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    if (article.description.isNotEmpty)
-                      Text(
-                        article.description,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          height: 1.6,
-                          color: Color(0xFF60675E),
-                        ),
-                      ),
-                    const SizedBox(height: 18),
-                    if (article.content.isNotEmpty)
-                      Text(
-                        article.content,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          height: 1.7,
-                          color: Color(0xFF424840),
-                        ),
-                      ),
-                    const SizedBox(height: 28),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: _openArticle,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                        child: const Text(
-                          'Read Full Article',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                  if (article.content.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      article.content,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        height: 1.7,
                       ),
                     ),
                   ],
-                ),
+                  const SizedBox(height: 30),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _openFullArticle(context);
+                      },
+                      icon: const Icon(
+                        Icons.open_in_new,
+                        size: 20,
+                      ),
+                      label: const Text(
+                        'View Full Article',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _formatDate(String date) {
-    if (date.isEmpty) {
-      return '';
-    }
-
-    try {
-      final parsedDate = DateTime.parse(date);
-      final difference = DateTime.now().difference(parsedDate);
-
-      if (difference.inMinutes < 60) {
-        return '${difference.inMinutes} min ago';
-      }
-
-      if (difference.inHours < 24) {
-        return '${difference.inHours} hr ago';
-      }
-
-      if (difference.inDays < 7) {
-        return '${difference.inDays} days ago';
-      }
-
-      return '${parsedDate.day}/${parsedDate.month}/${parsedDate.year}';
-    } catch (_) {
-      return date;
-    }
   }
 }

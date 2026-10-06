@@ -6,7 +6,6 @@ import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/bookmark_provider.dart';
 import 'providers/news_provider.dart';
-import 'providers/theme_provider.dart';
 import 'views/splash_screen.dart';
 
 void main() async {
@@ -35,9 +34,7 @@ class NewsApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => BookmarkProvider(),
         ),
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider(),
-        ),
+        
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
