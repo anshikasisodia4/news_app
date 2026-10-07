@@ -28,6 +28,8 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   Future<void> sendCode() async {
     final phone = phoneController.text.trim();
 
+    debugPrint('PHONE NUMBER ENTERED: $phone');
+
     if (phone.isEmpty) {
       _showMessage('Please enter your phone number');
       return;
@@ -133,9 +135,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
-
               Center(
                 child: Container(
                   width: 80,
@@ -154,9 +154,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 22),
-
               const Center(
                 child: Text(
                   'NewsNest',
@@ -167,9 +165,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 6),
-
               const Center(
                 child: Text(
                   'Login securely using your phone number.',
@@ -180,9 +176,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
-
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -203,9 +197,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                         color: Colors.white,
                       ),
                     ),
-
                     const SizedBox(height: 7),
-
                     const Text(
                       'Include your country code, for example +91.',
                       style: TextStyle(
@@ -213,9 +205,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                         color: Colors.white54,
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     TextField(
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
@@ -248,10 +238,8 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                         ),
                       ),
                     ),
-
                     if (otpSent) ...[
                       const SizedBox(height: 18),
-
                       TextField(
                         controller: otpController,
                         keyboardType: TextInputType.number,
@@ -279,9 +267,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                         ),
                       ),
                     ],
-
                     const SizedBox(height: 22),
-
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -323,10 +309,8 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                               ),
                       ),
                     ),
-
                     if (otpSent) ...[
                       const SizedBox(height: 12),
-
                       Center(
                         child: TextButton(
                           onPressed: () {
