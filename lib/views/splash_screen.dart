@@ -25,30 +25,22 @@ class _SplashScreenState extends State<SplashScreen> {
     final auth = context.read<AuthProvider>();
 
     while (!auth.isInitialized) {
-      await Future.delayed(
-        const Duration(milliseconds: 100),
-      );
+      await Future.delayed(const Duration(milliseconds: 100));
     }
 
-    await Future.delayed(
-      const Duration(seconds: 2),
-    );
+    await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
     if (auth.isLoggedIn) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
   }
@@ -68,11 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Icon(
-                Icons.newspaper,
-                size: 75,
-                color: Colors.black,
-              ),
+              child: const Icon(Icons.newspaper, size: 75, color: Colors.black),
             ),
             const SizedBox(height: 25),
             const Text(
@@ -86,10 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 8),
             const Text(
               'Your daily source of news',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF737A71),
-              ),
+              style: TextStyle(fontSize: 14, color: Color(0xFF737A71)),
             ),
             const SizedBox(height: 35),
             const SizedBox(

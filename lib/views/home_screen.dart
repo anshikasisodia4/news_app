@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/news_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/bookmark_provider.dart';
@@ -110,10 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(height: 5),
                         Text(
                           'Stay informed. Stay ahead.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white54,
-                          ),
+                          style: TextStyle(fontSize: 13, color: Colors.white54),
                         ),
                       ],
                     ),
@@ -145,24 +143,14 @@ class _HomeScreenState extends State<HomeScreen> {
               TextField(
                 controller: searchController,
                 onSubmitted: (_) => search(),
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Search news...',
-                  hintStyle: const TextStyle(
-                    color: Colors.grey,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  ),
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   suffixIcon: IconButton(
                     onPressed: search,
-                    icon: const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                    ),
+                    icon: const Icon(Icons.arrow_forward, color: Colors.white),
                   ),
                   filled: true,
                   fillColor: const Color(0xFF1E1E1E),
@@ -180,15 +168,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: categories.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(width: 8),
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
                   itemBuilder: (_, index) {
                     final category = categories[index];
 
                     final selected =
-                        news.selectedCategory ==
-                                category['value'] &&
-                            news.searchQuery.isEmpty;
+                        news.selectedCategory == category['value'] &&
+                        news.searchQuery.isEmpty;
 
                     return ChoiceChip(
                       label: Text(category['name']!),
@@ -198,13 +184,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       selectedColor: Colors.white,
                       labelStyle: TextStyle(
-                        color: selected
-                            ? Colors.black
-                            : Colors.white,
+                        color: selected ? Colors.black : Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
-                      backgroundColor:
-                          const Color(0xFF292929),
+                      backgroundColor: const Color(0xFF292929),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(22),
                         side: BorderSide.none,
@@ -232,9 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {},
                     child: const Text(
                       'See All',
-                      style: TextStyle(
-                        color: Colors.white70,
-                      ),
+                      style: TextStyle(color: Colors.white70),
                     ),
                   ),
                 ],
@@ -246,9 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Padding(
                   padding: EdgeInsets.all(40),
                   child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                    ),
+                    child: CircularProgressIndicator(color: Colors.white),
                   ),
                 )
               else if (news.error != null)
@@ -265,9 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         news.error!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                        ),
+                        style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 10),
                       ElevatedButton(
@@ -287,9 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: Text(
                       'No news found',
-                      style: TextStyle(
-                        color: Colors.white70,
-                      ),
+                      style: TextStyle(color: Colors.white70),
                     ),
                   ),
                 )
@@ -299,16 +274,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: NewsCard(
                       article: article,
-                      isBookmarked:
-                          bookmarks.isBookmarked(article.id),
+                      isBookmarked: bookmarks.isBookmarked(article.id),
                       onBookmark: () {
                         final user = auth.user;
 
                         if (user != null) {
-                          bookmarks.toggleBookmark(
-                            user.uid,
-                            article,
-                          );
+                          bookmarks.toggleBookmark(user.uid, article);
                         }
                       },
                       onTap: () {
@@ -316,9 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                ArticleDetailScreen(
-                              article: article,
-                            ),
+                                ArticleDetailScreen(article: article),
                           ),
                         );
                       },
@@ -339,23 +308,17 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 1) {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const CategoryScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const CategoryScreen()),
             );
           } else if (index == 2) {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const BookmarksScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const BookmarksScreen()),
             );
           } else if (index == 3) {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const SettingsScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
             );
           }
         },

@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'News App';
+  static const String appName = 'NewsNest';
 
   static const String generalCategory = 'general';
   static const String technologyCategory = 'technology';

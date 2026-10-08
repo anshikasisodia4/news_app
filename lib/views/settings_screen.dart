@@ -23,10 +23,7 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         title: const Text(
           'Profile',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
         ),
       ),
       body: SingleChildScrollView(
@@ -39,9 +36,7 @@ class SettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E1E),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: const Color(0xFF303030),
-                ),
+                border: Border.all(color: const Color(0xFF303030)),
               ),
               child: Column(
                 children: [
@@ -73,10 +68,7 @@ class SettingsScreen extends StatelessWidget {
                   Text(
                     user?.email ?? 'Welcome to News Hub',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white60,
-                      fontSize: 14,
-                    ),
+                    style: const TextStyle(color: Colors.white60, fontSize: 14),
                   ),
                   const SizedBox(height: 14),
                   Container(
@@ -108,9 +100,7 @@ class SettingsScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const BookmarksScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const BookmarksScreen()),
                 );
               },
               child: Container(
@@ -119,9 +109,7 @@ class SettingsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFF303030),
-                  ),
+                  border: Border.all(color: const Color(0xFF303030)),
                 ),
                 child: Row(
                   children: [
@@ -141,8 +129,7 @@ class SettingsScreen extends StatelessWidget {
                     const SizedBox(width: 15),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
                             'Saved Articles',
@@ -181,9 +168,7 @@ class SettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E1E),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: const Color(0xFF303030),
-                ),
+                border: Border.all(color: const Color(0xFF303030)),
               ),
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,10 +195,7 @@ class SettingsScreen extends StatelessWidget {
                   SizedBox(height: 15),
                   Text(
                     'Version 1.0.0',
-                    style: TextStyle(
-                      color: Colors.white38,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.white38, fontSize: 12),
                   ),
                 ],
               ),
@@ -232,16 +214,11 @@ class SettingsScreen extends StatelessWidget {
 
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const LoginScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                     (route) => false,
                   );
                 },
-                icon: const Icon(
-                  Icons.logout,
-                  color: Colors.white,
-                ),
+                icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text(
                   'Logout',
                   style: TextStyle(
@@ -251,9 +228,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(
-                    color: Color(0xFF444444),
-                  ),
+                  side: const BorderSide(color: Color(0xFF444444)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -265,10 +240,7 @@ class SettingsScreen extends StatelessWidget {
 
             const Text(
               'Thank you for using News Hub',
-              style: TextStyle(
-                color: Colors.white38,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: Colors.white38, fontSize: 13),
             ),
 
             const SizedBox(height: 20),

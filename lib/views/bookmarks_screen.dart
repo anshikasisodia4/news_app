@@ -37,19 +37,14 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
         elevation: 0,
         title: const Text(
           'Saved Articles',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
         ),
       ),
       body: Consumer<BookmarkProvider>(
         builder: (context, bookmarks, child) {
           if (bookmarks.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
+              child: CircularProgressIndicator(color: Colors.white),
             );
           }
 
@@ -123,10 +118,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                     const Text(
                       'Articles you bookmark will appear here.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.white54, fontSize: 14),
                     ),
                   ],
                 ),
@@ -145,9 +137,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: const Color(0xFF303030),
-                  ),
+                  border: Border.all(color: const Color(0xFF303030)),
                 ),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(18),
@@ -155,9 +145,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ArticleDetailScreen(
-                          article: article,
-                        ),
+                        builder: (_) => ArticleDetailScreen(article: article),
                       ),
                     );
                   },
@@ -174,8 +162,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                                   width: 105,
                                   height: 90,
                                   fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) {
+                                  errorBuilder: (context, error, stackTrace) {
                                     return Container(
                                       width: 105,
                                       height: 90,
@@ -200,8 +187,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 article.title,
@@ -230,22 +216,15 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                         const SizedBox(width: 4),
                         IconButton(
                           onPressed: () async {
-                            final auth =
-                                context.read<AuthProvider>();
+                            final auth = context.read<AuthProvider>();
 
                             if (auth.user != null) {
                               await context
                                   .read<BookmarkProvider>()
-                                  .removeBookmark(
-                                    auth.user!.uid,
-                                    article.id,
-                                  );
+                                  .removeBookmark(auth.user!.uid, article.id);
                             }
                           },
-                          icon: const Icon(
-                            Icons.bookmark,
-                            color: Colors.white,
-                          ),
+                          icon: const Icon(Icons.bookmark, color: Colors.white),
                         ),
                       ],
                     ),

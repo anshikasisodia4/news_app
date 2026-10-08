@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../providers/auth_provider.dart';
 import '../home_screen.dart';
 import 'login_screen.dart';
@@ -66,9 +67,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (_) => const HomeScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
       (route) => false,
     );
   }
@@ -77,12 +76,7 @@ class _SignupScreenState extends State<SignupScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: const Color(0xFF2A2A2A),
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-        ),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -108,10 +102,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 child: IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
                 ),
               ),
 
@@ -124,9 +115,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E1E1E),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: const Color(0xFF303030),
-                    ),
+                    border: Border.all(color: const Color(0xFF303030)),
                   ),
                   child: const Icon(
                     Icons.newspaper_rounded,
@@ -155,10 +144,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Text(
                   'Create your account and start exploring.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white54,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white54),
                 ),
               ),
 
@@ -169,23 +155,17 @@ class _SignupScreenState extends State<SignupScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(26),
-                  border: Border.all(
-                    color: const Color(0xFF303030),
-                  ),
+                  border: Border.all(color: const Color(0xFF303030)),
                 ),
                 child: Column(
                   children: [
                     TextField(
                       controller: nameController,
                       textCapitalization: TextCapitalization.words,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Full Name',
-                        labelStyle: const TextStyle(
-                          color: Colors.white54,
-                        ),
+                        labelStyle: const TextStyle(color: Colors.white54),
                         prefixIcon: const Icon(
                           Icons.person_outline,
                           color: Colors.white54,
@@ -204,14 +184,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        labelStyle: const TextStyle(
-                          color: Colors.white54,
-                        ),
+                        labelStyle: const TextStyle(color: Colors.white54),
                         prefixIcon: const Icon(
                           Icons.email_outlined,
                           color: Colors.white54,
@@ -230,14 +206,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: passwordController,
                       obscureText: obscurePassword,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        labelStyle: const TextStyle(
-                          color: Colors.white54,
-                        ),
+                        labelStyle: const TextStyle(color: Colors.white54),
                         prefixIcon: const Icon(
                           Icons.lock_outline,
                           color: Colors.white54,
@@ -269,14 +241,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: confirmPasswordController,
                       obscureText: obscureConfirmPassword,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
-                        labelStyle: const TextStyle(
-                          color: Colors.white54,
-                        ),
+                        labelStyle: const TextStyle(color: Colors.white54),
                         prefixIcon: const Icon(
                           Icons.lock_outline,
                           color: Colors.white54,
@@ -284,8 +252,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
-                              obscureConfirmPassword =
-                                  !obscureConfirmPassword;
+                              obscureConfirmPassword = !obscureConfirmPassword;
                             });
                           },
                           icon: Icon(
@@ -314,10 +281,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
-                          disabledBackgroundColor:
-                              const Color(0xFF444444),
-                          disabledForegroundColor:
-                              Colors.white54,
+                          disabledBackgroundColor: const Color(0xFF444444),
+                          disabledForegroundColor: Colors.white54,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -352,9 +317,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
                     );
                   },
                   child: const Text(
