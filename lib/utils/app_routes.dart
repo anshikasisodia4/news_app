@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../views/splash_screen.dart';
 import '../views/home_screen.dart';
 import '../views/settings_screen.dart';
