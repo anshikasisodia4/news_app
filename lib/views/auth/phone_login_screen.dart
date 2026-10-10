@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../home_screen.dart';
+import '../../services/demo_otp_service.dart';
 
 class PhoneLoginScreen extends StatefulWidget {
   const PhoneLoginScreen({super.key});
@@ -24,65 +25,84 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
     super.dispose();
   }
 
-  Future<void> sendCode() async {
-    final phone = phoneController.text.trim();
+ 
+Future<void> sendCode() async {
+  final input = phoneController.text.trim();
 
-    debugPrint('PHONE NUMBER ENTERED: $phone');
+  // Accept either 10 digits or +91 followed by 10 digits.
+  final phone = input.replaceAll(RegExp(r'[\s-]'), '');
+  final mobile = phone.startsWith('+91')
+      ? phone.substring(3)
+      : phone;
 
-    if (phone.isEmpty) {
-      _showMessage('Please enter your phone number');
+  if (!DemoOtpService.isEnabled) {
+    final auth = context.read<AuthProvider>();
+
+    if (!phone.startsWith('+91') ||
+        !DemoOtpService.isValidIndianMobile(mobile)) {
+      _showMessage('Enter a valid Indian number with +91');
       return;
     }
 
-    final auth = context.read<AuthProvider>();
+    await auth.sendPhoneCode(phone, (id) {
+      if (!mounted) return;
 
-    await auth.sendPhoneCode(
-      phone,
-      (id) {
-        if (!mounted) return;
+      setState(() {
+        verificationId = id;
+        otpSent = true;
+      });
 
-        setState(() {
-          verificationId = id;
-          otpSent = true;
-        });
+      _showMessage('OTP sent successfully');
+    });
 
-        _showMessage('OTP sent successfully');
-      },
-    );
-
-    if (!mounted) return;
-
-    if (auth.error != null) {
+    if (mounted && auth.error != null) {
       _showMessage(auth.error!);
     }
+    return;
   }
 
-  Future<void> verifyCode() async {
-    final otp = otpController.text.trim();
+  if (!DemoOtpService.isValidIndianMobile(mobile)) {
+    _showMessage('Enter a valid 10-digit Indian mobile number');
+    return;
+  }
 
-    if (verificationId == null) {
-      _showMessage('Please request an OTP first');
-      return;
-    }
+  setState(() {
+    verificationId = 'DEMO';
+    otpSent = true;
+    otpController.clear();
+  });
 
-    if (otp.isEmpty) {
-      _showMessage('Please enter the OTP');
-      return;
-    }
+  _showMessage('Demo OTP: 123456 ');
+}
 
-    final auth = context.read<AuthProvider>();
 
-    await auth.verifyPhoneCode(
-      verificationId!,
-      otp,
+ 
+Future<void> verifyCode() async {
+  final otp = otpController.text.trim();
+  final phone = phoneController.text.trim()
+      .replaceAll(RegExp(r'[\s-]'), '');
+
+  final mobile = phone.startsWith('+91')
+      ? phone.substring(3)
+      : phone;
+
+  if (otp.isEmpty) {
+    _showMessage('Please enter the OTP');
+    return;
+  }
+
+  if (DemoOtpService.isEnabled) {
+    final success = DemoOtpService.verifyOtp(
+      phoneNumber: mobile,
+      otp: otp,
     );
 
-    if (!mounted) return;
-
-    if (auth.error != null) {
-      _showMessage(auth.error!);
+    if (!success) {
+      _showMessage('Invalid OTP. Use 123456.');
       return;
     }
+
+    if (!mounted) return;
 
     Navigator.pushAndRemoveUntil(
       context,
@@ -91,7 +111,35 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
       ),
       (route) => false,
     );
+    return;
   }
+
+  if (verificationId == null ||
+      verificationId == 'DEMO') {
+    _showMessage('Please request an OTP first');
+    return;
+  }
+
+  final auth = context.read<AuthProvider>();
+
+  await auth.verifyPhoneCode(verificationId!, otp);
+
+  if (!mounted) return;
+
+  if (auth.error != null) {
+    _showMessage(auth.error!);
+    return;
+  }
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const HomeScreen(),
+    ),
+    (route) => false,
+  );
+}
+
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
