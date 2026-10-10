@@ -23,8 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final categories = [
     {'name': 'All News', 'value': 'general'},
     {'name': 'Sports', 'value': 'sports'},
-    {'name': 'World', 'value': 'general'},
+    {'name': 'Technology', 'value': 'technology'},
     {'name': 'Business', 'value': 'business'},
+    {'name': 'Entertainment', 'value': 'entertainment'},
+    {'name': 'Health', 'value': 'health'},
+    {'name': 'Science', 'value': 'science'},
   ];
 
   @override
@@ -162,14 +165,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 22),
-
               SizedBox(
-                height: 42,
+                height: 45,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  padding: const EdgeInsets.only(right: 8),
                   itemCount: categories.length,
                   separatorBuilder: (_, _) => const SizedBox(width: 8),
-                  itemBuilder: (_, index) {
+                  itemBuilder: (context, index) {
                     final category = categories[index];
 
                     final selected =

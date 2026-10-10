@@ -7,31 +7,15 @@ class CategoryScreen extends StatelessWidget {
   const CategoryScreen({super.key});
 
   final List<Map<String, dynamic>> categories = const [
-    {
-      'name': 'Technology',
-      'value': 'technology',
-      'icon': Icons.computer,
-    },
-    {
-      'name': 'Sports',
-      'value': 'sports',
-      'icon': Icons.sports_soccer,
-    },
-    {
-      'name': 'Business',
-      'value': 'business',
-      'icon': Icons.business_center,
-    },
+    {'name': 'Technology', 'value': 'technology', 'icon': Icons.computer},
+    {'name': 'Sports', 'value': 'sports', 'icon': Icons.sports_soccer},
+    {'name': 'Business', 'value': 'business', 'icon': Icons.business_center},
     {
       'name': 'Entertainment',
       'value': 'entertainment',
       'icon': Icons.movie_outlined,
     },
-    {
-      'name': 'Science',
-      'value': 'science',
-      'icon': Icons.science_outlined,
-    },
+    {'name': 'Science', 'value': 'science', 'icon': Icons.science_outlined},
     {
       'name': 'Health',
       'value': 'health',
@@ -51,10 +35,7 @@ class CategoryScreen extends StatelessWidget {
         elevation: 0,
         title: const Text(
           'Categories',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
         ),
       ),
       body: Padding(
@@ -75,10 +56,7 @@ class CategoryScreen extends StatelessWidget {
 
             const Text(
               'Choose a category to discover the latest stories.',
-              style: TextStyle(
-                color: Colors.white60,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.white60, fontSize: 14),
             ),
 
             const SizedBox(height: 25),
@@ -86,8 +64,7 @@ class CategoryScreen extends StatelessWidget {
             Expanded(
               child: GridView.builder(
                 itemCount: categories.length,
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 14,
                   mainAxisSpacing: 14,
@@ -98,9 +75,7 @@ class CategoryScreen extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      news.changeCategory(
-                        category['value'],
-                      );
+                      news.changeCategory(category['value']);
 
                       Navigator.pop(context);
                     },
@@ -108,9 +83,7 @@ class CategoryScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E1E1E),
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(
-                          color: const Color(0xFF303030),
-                        ),
+                        border: Border.all(color: const Color(0xFF303030)),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -120,8 +93,7 @@ class CategoryScreen extends StatelessWidget {
                             height: 58,
                             decoration: BoxDecoration(
                               color: const Color(0xFF292929),
-                              borderRadius:
-                                  BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(18),
                             ),
                             child: Icon(
                               category['icon'],

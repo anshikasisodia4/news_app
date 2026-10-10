@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../providers/auth_provider.dart';
 import '../home_screen.dart';
 import '../../services/demo_otp_service.dart';
@@ -25,132 +26,110 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
     super.dispose();
   }
 
- 
-Future<void> sendCode() async {
-  final input = phoneController.text.trim();
+  Future<void> sendCode() async {
+    final input = phoneController.text.trim();
 
-  // Accept either 10 digits or +91 followed by 10 digits.
-  final phone = input.replaceAll(RegExp(r'[\s-]'), '');
-  final mobile = phone.startsWith('+91')
-      ? phone.substring(3)
-      : phone;
+    // Accept either 10 digits or +91 followed by 10 digits.
+    final phone = input.replaceAll(RegExp(r'[\s-]'), '');
+    final mobile = phone.startsWith('+91') ? phone.substring(3) : phone;
 
-  if (!DemoOtpService.isEnabled) {
-    final auth = context.read<AuthProvider>();
+    if (!DemoOtpService.isEnabled) {
+      final auth = context.read<AuthProvider>();
 
-    if (!phone.startsWith('+91') ||
-        !DemoOtpService.isValidIndianMobile(mobile)) {
-      _showMessage('Enter a valid Indian number with +91');
-      return;
-    }
+      if (!phone.startsWith('+91') ||
+          !DemoOtpService.isValidIndianMobile(mobile)) {
+        _showMessage('Enter a valid Indian number with +91');
+        return;
+      }
 
-    await auth.sendPhoneCode(phone, (id) {
-      if (!mounted) return;
+      await auth.sendPhoneCode(phone, (id) {
+        if (!mounted) return;
 
-      setState(() {
-        verificationId = id;
-        otpSent = true;
+        setState(() {
+          verificationId = id;
+          otpSent = true;
+        });
+
+        _showMessage('OTP sent successfully');
       });
 
-      _showMessage('OTP sent successfully');
-    });
-
-    if (mounted && auth.error != null) {
-      _showMessage(auth.error!);
-    }
-    return;
-  }
-
-  if (!DemoOtpService.isValidIndianMobile(mobile)) {
-    _showMessage('Enter a valid 10-digit Indian mobile number');
-    return;
-  }
-
-  setState(() {
-    verificationId = 'DEMO';
-    otpSent = true;
-    otpController.clear();
-  });
-
-  _showMessage('Demo OTP: 123456 ');
-}
-
-
- 
-Future<void> verifyCode() async {
-  final otp = otpController.text.trim();
-  final phone = phoneController.text.trim()
-      .replaceAll(RegExp(r'[\s-]'), '');
-
-  final mobile = phone.startsWith('+91')
-      ? phone.substring(3)
-      : phone;
-
-  if (otp.isEmpty) {
-    _showMessage('Please enter the OTP');
-    return;
-  }
-
-  if (DemoOtpService.isEnabled) {
-    final success = DemoOtpService.verifyOtp(
-      phoneNumber: mobile,
-      otp: otp,
-    );
-
-    if (!success) {
-      _showMessage('Invalid OTP. Use 123456.');
+      if (mounted && auth.error != null) {
+        _showMessage(auth.error!);
+      }
       return;
     }
+
+    if (!DemoOtpService.isValidIndianMobile(mobile)) {
+      _showMessage('Enter a valid 10-digit Indian mobile number');
+      return;
+    }
+
+    setState(() {
+      verificationId = 'DEMO';
+      otpSent = true;
+      otpController.clear();
+    });
+
+    _showMessage('Demo OTP: 123456 ');
+  }
+
+  Future<void> verifyCode() async {
+    final otp = otpController.text.trim();
+    final phone = phoneController.text.trim().replaceAll(RegExp(r'[\s-]'), '');
+
+    final mobile = phone.startsWith('+91') ? phone.substring(3) : phone;
+
+    if (otp.isEmpty) {
+      _showMessage('Please enter the OTP');
+      return;
+    }
+
+    if (DemoOtpService.isEnabled) {
+      final success = DemoOtpService.verifyOtp(phoneNumber: mobile, otp: otp);
+
+      if (!success) {
+        _showMessage('Invalid OTP. Use 123456.');
+        return;
+      }
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (route) => false,
+      );
+      return;
+    }
+
+    if (verificationId == null || verificationId == 'DEMO') {
+      _showMessage('Please request an OTP first');
+      return;
+    }
+
+    final auth = context.read<AuthProvider>();
+
+    await auth.verifyPhoneCode(verificationId!, otp);
 
     if (!mounted) return;
 
+    if (auth.error != null) {
+      _showMessage(auth.error!);
+      return;
+    }
+
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (_) => const HomeScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
       (route) => false,
     );
-    return;
   }
-
-  if (verificationId == null ||
-      verificationId == 'DEMO') {
-    _showMessage('Please request an OTP first');
-    return;
-  }
-
-  final auth = context.read<AuthProvider>();
-
-  await auth.verifyPhoneCode(verificationId!, otp);
-
-  if (!mounted) return;
-
-  if (auth.error != null) {
-    _showMessage(auth.error!);
-    return;
-  }
-
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const HomeScreen(),
-    ),
-    (route) => false,
-  );
-}
-
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: const Color(0xFF2A2A2A),
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-        ),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -176,10 +155,7 @@ Future<void> verifyCode() async {
                 ),
                 child: IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 30),
@@ -190,9 +166,7 @@ Future<void> verifyCode() async {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E1E1E),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: const Color(0xFF303030),
-                    ),
+                    border: Border.all(color: const Color(0xFF303030)),
                   ),
                   child: const Icon(
                     Icons.phone_android_rounded,
@@ -217,10 +191,7 @@ Future<void> verifyCode() async {
                 child: Text(
                   'Login securely using your phone number.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white54,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white54),
                 ),
               ),
               const SizedBox(height: 30),
@@ -229,9 +200,7 @@ Future<void> verifyCode() async {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(26),
-                  border: Border.all(
-                    color: const Color(0xFF303030),
-                  ),
+                  border: Border.all(color: const Color(0xFF303030)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,28 +216,19 @@ Future<void> verifyCode() async {
                     const SizedBox(height: 7),
                     const Text(
                       'Include your country code, for example +91.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white54,
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.white54),
                     ),
                     const SizedBox(height: 20),
                     TextField(
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
                       enabled: !otpSent,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Phone Number',
-                        labelStyle: const TextStyle(
-                          color: Colors.white54,
-                        ),
+                        labelStyle: const TextStyle(color: Colors.white54),
                         hintText: '+91 9876543210',
-                        hintStyle: const TextStyle(
-                          color: Colors.white38,
-                        ),
+                        hintStyle: const TextStyle(color: Colors.white38),
                         prefixIcon: const Icon(
                           Icons.phone_outlined,
                           color: Colors.white54,
@@ -297,9 +257,7 @@ Future<void> verifyCode() async {
                         ),
                         decoration: InputDecoration(
                           labelText: 'Enter OTP',
-                          labelStyle: const TextStyle(
-                            color: Colors.white54,
-                          ),
+                          labelStyle: const TextStyle(color: Colors.white54),
                           prefixIcon: const Icon(
                             Icons.password_outlined,
                             color: Colors.white54,
@@ -322,15 +280,13 @@ Future<void> verifyCode() async {
                         onPressed: auth.isLoading
                             ? null
                             : otpSent
-                                ? verifyCode
-                                : sendCode,
+                            ? verifyCode
+                            : sendCode,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
-                          disabledBackgroundColor:
-                              const Color(0xFF444444),
-                          disabledForegroundColor:
-                              Colors.white54,
+                          disabledBackgroundColor: const Color(0xFF444444),
+                          disabledForegroundColor: Colors.white54,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -346,9 +302,7 @@ Future<void> verifyCode() async {
                                 ),
                               )
                             : Text(
-                                otpSent
-                                    ? 'Verify OTP'
-                                    : 'Send OTP',
+                                otpSent ? 'Verify OTP' : 'Send OTP',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
