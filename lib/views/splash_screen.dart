@@ -24,31 +24,30 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _startApp() async {
     final auth = context.read<AuthProvider>();
 
-    while (!auth.isInitialized) {
+    while (mounted && !auth.isInitialized) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
+
+    if (!mounted) return;
 
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
-    if (auth.isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => auth.isLoggedIn
+            ? const HomeScreen()
+            : const LoginScreen(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 15, 15, 15),
+      backgroundColor: const Color(0xFF0F0F0F),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +59,11 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Icon(Icons.newspaper, size: 75, color: Colors.black),
+              child: const Icon(
+                Icons.newspaper_rounded,
+                size: 75,
+                color: Color(0xFF121212),
+              ),
             ),
             const SizedBox(height: 25),
             const Text(
@@ -68,21 +71,34 @@ class _SplashScreenState extends State<SplashScreen> {
               style: TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF20251F),
+                color: Colors.white,
+                letterSpacing: 0.5,
               ),
             ),
             const SizedBox(height: 8),
             const Text(
               'Your daily source of news',
-              style: TextStyle(fontSize: 14, color: Color(0xFF737A71)),
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white70,
+              ),
             ),
             const SizedBox(height: 35),
             const SizedBox(
-              width: 25,
-              height: 25,
+              width: 36,
+              height: 36,
               child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: Colors.black,
+                strokeWidth: 3.5,
+                color: Colors.white,
+                backgroundColor: Color(0xFF444444),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Getting things ready...',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.white54,
               ),
             ),
           ],
