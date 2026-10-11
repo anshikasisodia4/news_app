@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../providers/auth_provider.dart';
 import '../home_screen.dart';
 import 'phone_login_screen.dart';
@@ -25,16 +26,35 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _login() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+  bool _isValidEmail(String email) {
+    return RegExp(
+      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+    ).hasMatch(email.trim());
+  }
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter email and password'),
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: const Color(0xFF303030),
         ),
       );
+  }
+
+  Future<void> _login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _showMessage('Please enter email and password.');
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showMessage('Please enter a valid email address.');
       return;
     }
 
@@ -55,12 +75,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            auth.error ?? 'Login failed',
-          ),
-        ),
+      _showMessage(
+        auth.error ?? 'Login failed. Please try again.',
       );
     }
   }
@@ -80,14 +96,50 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            auth.error ?? 'Google Sign-In failed',
-          ),
-        ),
+      _showMessage(
+        auth.error ?? 'Google Sign-In failed.',
       );
     }
+  }
+
+  InputDecoration _inputDecoration({
+    required String hint,
+    required IconData icon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(
+        color: Colors.white38,
+      ),
+      prefixIcon: Icon(
+        icon,
+        color: Colors.white54,
+      ),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: const Color(0xFF1E1E1E),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 18,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: Color(0xFF303030),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: Colors.white70,
+        ),
+      ),
+    );
   }
 
   @override
@@ -188,24 +240,14 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                autocorrect: false,
                 style: const TextStyle(
                   color: Colors.white,
                 ),
-                decoration: InputDecoration(
-                  hintText: 'Enter your email',
-                  hintStyle: const TextStyle(
-                    color: Colors.white38,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.email_outlined,
-                    color: Colors.white54,
-                  ),
-                  filled: true,
-                  fillColor: const Color(0xFF1E1E1E),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
+                decoration: _inputDecoration(
+                  hint: 'Enter your email',
+                  icon: Icons.email_outlined,
                 ),
               ),
 
@@ -225,18 +267,18 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: passwordController,
                 obscureText: obscurePassword,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) {
+                  if (!auth.isLoading) {
+                    _login();
+                  }
+                },
                 style: const TextStyle(
                   color: Colors.white,
                 ),
-                decoration: InputDecoration(
-                  hintText: 'Enter your password',
-                  hintStyle: const TextStyle(
-                    color: Colors.white38,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.lock_outline,
-                    color: Colors.white54,
-                  ),
+                decoration: _inputDecoration(
+                  hint: 'Enter your password',
+                  icon: Icons.lock_outline,
                   suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
@@ -249,12 +291,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           : Icons.visibility_outlined,
                       color: Colors.white54,
                     ),
-                  ),
-                  filled: true,
-                  fillColor: const Color(0xFF1E1E1E),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
@@ -271,8 +307,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     foregroundColor: Colors.black,
                     disabledBackgroundColor:
                         const Color(0xFF444444),
-                    disabledForegroundColor:
-                        Colors.white54,
+                    disabledForegroundColor: Colors.white54,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -298,15 +333,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 22),
 
-              Row(
+              const Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Divider(
                       color: Color(0xFF303030),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 15,
                     ),
                     child: Text(
@@ -317,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Divider(
                       color: Color(0xFF303030),
                     ),
@@ -412,14 +447,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SignupScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: auth.isLoading
+                        ? null
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SignupScreen(),
+                              ),
+                            );
+                          },
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(

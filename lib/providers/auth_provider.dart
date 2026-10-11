@@ -25,6 +25,43 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
+  bool _isValidEmail(String email) {
+    return RegExp(
+      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+    ).hasMatch(email.trim());
+  }
+
+  String _getFriendlyError(Object error) {
+    if (error is FirebaseAuthException) {
+      switch (error.code) {
+        case 'invalid-email':
+          return 'Please enter a valid email address.';
+        case 'user-not-found':
+        case 'wrong-password':
+        case 'invalid-credential':
+          return 'Invalid email or password.';
+        case 'email-already-in-use':
+          return 'An account with this email already exists.';
+        case 'weak-password':
+          return 'Please choose a stronger password.';
+        case 'too-many-requests':
+          return 'Too many attempts. Please try again later.';
+        case 'network-request-failed':
+          return 'Please check your internet connection.';
+        case 'user-disabled':
+          return 'This account has been disabled.';
+        case 'invalid-verification-code':
+          return 'Incorrect OTP. Please try again.';
+        case 'session-expired':
+          return 'Your OTP has expired. Please request a new one.';
+        default:
+          return 'Something went wrong. Please try again.';
+      }
+    }
+
+    return 'Something went wrong. Please try again.';
+  }
+
   Future<void> initializeGoogleSignIn() async {
     await _authService.initializeGoogleSignIn();
   }
@@ -35,10 +72,9 @@ class AuthProvider extends ChangeNotifier {
       _error = null;
 
       await _authService.signInWithGoogle();
-
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = _getFriendlyError(e);
       return false;
     } finally {
       _setLoading(false);
@@ -49,15 +85,22 @@ class AuthProvider extends ChangeNotifier {
     String email,
     String password,
   ) async {
+    final cleanEmail = email.trim();
+
+    if (!_isValidEmail(cleanEmail)) {
+      _error = 'Please enter a valid email address.';
+      notifyListeners();
+      return false;
+    }
+
     try {
       _setLoading(true);
       _error = null;
 
-      await _authService.loginWithEmail(email, password);
-
+      await _authService.loginWithEmail(cleanEmail, password);
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = _getFriendlyError(e);
       return false;
     } finally {
       _setLoading(false);
@@ -68,15 +111,22 @@ class AuthProvider extends ChangeNotifier {
     String email,
     String password,
   ) async {
+    final cleanEmail = email.trim();
+
+    if (!_isValidEmail(cleanEmail)) {
+      _error = 'Please enter a valid email address.';
+      notifyListeners();
+      return false;
+    }
+
     try {
       _setLoading(true);
       _error = null;
 
-      await _authService.signUpWithEmail(email, password);
-
+      await _authService.signUpWithEmail(cleanEmail, password);
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = _getFriendlyError(e);
       return false;
     } finally {
       _setLoading(false);
@@ -95,14 +145,14 @@ class AuthProvider extends ChangeNotifier {
         phoneNumber: phoneNumber,
         codeSent: onCodeSent,
         verificationFailed: (error) {
-          _error = error.message ?? 'Phone verification failed';
+          _error = _getFriendlyError(error);
           notifyListeners();
         },
       );
 
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = _getFriendlyError(e);
       return false;
     } finally {
       _setLoading(false);
@@ -124,7 +174,7 @@ class AuthProvider extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = _getFriendlyError(e);
       return false;
     } finally {
       _setLoading(false);
@@ -137,7 +187,7 @@ class AuthProvider extends ChangeNotifier {
       _user = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      _error = _getFriendlyError(e);
       notifyListeners();
     }
   }
